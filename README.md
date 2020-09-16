@@ -15,3 +15,4 @@ Les objectifs de ce laboratoire sont :
 • Proposer des optimisations
 • Analyser asymptotiquement l’algorithme
 • Être en mesure de justifier les choix de conception
+ 
