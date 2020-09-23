@@ -48,6 +48,13 @@ public class BitInputStream {
         return result;
     }
 
+    public int readByte() {
+        if (digits == -1)
+            return -1;
+        nextByte();
+        return digits;
+    }
+
     // post: refreshes the internal buffer with the next BYTE_SIZE bits
     private void nextByte() {
         try {
