@@ -1,4 +1,4 @@
-package log320_Lab1.src;
+
 
 // The BitOutputStream and BitInputStream classes provide the ability to
 // write and read individual bits to a file in a compact form.  One major
@@ -48,12 +48,6 @@ public class BitInputStream {
         return result;
     }
 
-    public int readByte() {
-        if (digits == -1)
-            return -1;
-        nextByte();
-        return digits;
-    }
 
     // post: refreshes the internal buffer with the next BYTE_SIZE bits
     private void nextByte() {

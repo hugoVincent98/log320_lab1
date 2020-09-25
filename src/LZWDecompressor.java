@@ -1,4 +1,4 @@
-package log320_Lab1.src;
+
 
 import java.util.Map;
 
@@ -25,9 +25,9 @@ public class LZWDecompressor{
      * Permet de Decompresser le fichier demander selon LWZ
      * 
      */
-    public void decompress() {
+   /* public void decompress() {
         
-    }
+    }*/
 
 
 

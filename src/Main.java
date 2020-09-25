@@ -1,4 +1,4 @@
-package log320_Lab1.src;
+
 import java.io.IOException;
 
 
@@ -10,11 +10,16 @@ public class Main {
         la topologie que nous devons utilise pour acceder aux algo avec le terminal
         */
 
-       
+        args = new String[]{"lzw","c","C:\\Users\\Rajani\\Documents\\GitHub\\log320_Lab1\\media_files\\text.txt", "test2.txt"};
 
         if (args[0].equals("lzw") && args[1].equals("c")){
             LZWCompressor myCompressor = new LZWCompressor(args[2], args[3]);
-            myCompressor.compress();
+            try {
+                myCompressor.compress();
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
             try {
                 myCompressor.save();
             } catch (IOException e ) {
@@ -23,7 +28,7 @@ public class Main {
         
         }
         else if (args[0].equals("lzw") && args[1].equals("d")) {
-            LZWDecompressor myDeCompressor = new LZWDecompressor(args[2], args[3]);
+           // LZWDecompressor myDeCompressor = new LZWDecompressor(args[2], args[3]);
         }
 
 
