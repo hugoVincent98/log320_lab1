@@ -97,12 +97,13 @@ public class LZWCompressor {
         System.out.println(strs);
           
         //passe sur tous la liste de String et sur chaque charactere des strings
+        for(int i=0; i<strs.size(); i++) {
             for(int j=0; j<strs.get(i).length(); j++){
 
                 //sort le premier charactere(premier bit) de la string en charactere 
                 char monChara = strs.get(i).charAt(strs.get(i).length()-1-j);
 
-                //ecrit dans le fichier et change le charactere en int, car sinon il affiche le charactere en code ascii
+                //ecrit dans le fichier et change le charactere en int, car sinon il affiche le charactere en code
                 bos.writeBit(Character.getNumericValue(monChara));
             }
         }   
