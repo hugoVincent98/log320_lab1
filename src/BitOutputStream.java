@@ -70,7 +70,7 @@ public class BitOutputStream {
     }
 
     // included to ensure that the stream is closed
-    protected void finalize() {
+    /*protected void finalize() {
         close();
-    }
+    }*/
 }
