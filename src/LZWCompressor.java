@@ -2,6 +2,9 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import sun.jvm.hotspot.utilities.Bits;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -48,7 +51,6 @@ public class LZWCompressor {
 
 
         //pseudo code -------->
-       
         String c = "";
         String p = listeChar.get(0);
         int code = 256;
@@ -83,26 +85,27 @@ public class LZWCompressor {
 
         
 
-        String text = "";
+        BitOutputStream bos = new BitOutputStream(fileOutput);
+
+        //change tous les chiffre en binaire et les met dans une liste de string
+        ArrayList<String> strs = new ArrayList<String>();
         for (Integer i : compressedFile ) {
-            text += i + "," ;
+            String result = Integer.toBinaryString(i);
+            String resultWithPadding = String.format("%8s", result).replace(" ", "0");  // 8-bit Integer
+            strs.add(resultWithPadding);
         }
-        text = text.substring(0, text.length() - 1);
+        System.out.println(strs);
+          
+        //passe sur tous la liste de String et sur chaque charactere des strings
+            for(int j=0; j<strs.get(i).length(); j++){
 
+                //sort le premier charactere(premier bit) de la string en charactere 
+                char monChara = strs.get(i).charAt(strs.get(i).length()-1-j);
 
-       /* BitOutputStream bos = new BitOutputStream(fileOutput);
-        
-        for (int i = 0; i< compressedFile.size() ; i++ ) {
-            bos.writeBit(compressedFile.get(i));
-        }*/
-        
-        
-        try (PrintStream out = new PrintStream(new FileOutputStream(fileOutput))) {
-            out.print(text);
-        }
-
-        
-        
+                //ecrit dans le fichier et change le charactere en int, car sinon il affiche le charactere en code ascii
+                bos.writeBit(Character.getNumericValue(monChara));
+            }
+        }   
                 
     }
 }

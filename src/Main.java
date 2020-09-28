@@ -1,46 +1,53 @@
 
 import java.io.IOException;
-import java.util.Arrays;
 
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
-
-        final String algotype = args[0];
-        final String parameters = args[1];
-        final String inputFile = args[2];
-        final String outputFile = args[3];
-        final int maxArgs = 4;
-
+    public static void main(String[] args) {
 
         /*–[huff|lzw|opt] –[d|c] <fichier d’entrée> <fichier de sortie>
         la topologie que nous devons utilise pour acceder aux algo avec le terminal
         */
 
-        if (args.length != maxArgs) {
-            System.out.println("Missing arguments");
-            System.out.println("–[huff|lzw|opt] –[d|c] <inputFile> <outputFile>");
-        } else {
 
-            if (parameters.equals("-c") || parameters.equals("-d")) {
-                switch (algotype){
-                    case "-lzw" :   // LZW lzw = new LZW(inputFile,outputFile);
-                                    // LZWCompressor lzwc = new LZWCompressor(inputFile,outputFile,parameters);
-                        break;
-                    case "-huff" :  // Huffman huffman = new Huffman(inputFile,outputFile);
-                                    // Huffman huffman = new Huffman(inputFile,outputFile,parameters);
-                        break;
-                    case "-opt" :   // OPT opt = new OPT(inputFile,outputFile);
-                                    // OPT opt = new OPT(inputFile,outputFile,parameters);
-                        break;
-                    default:        System.out.println("–[huff|lzw|opt]");
-                }
-            } else {
-                System.out.println("–[d|c]");
+        if (args[0].equals("-lzw") && args[1].equals("-c")){
+            LZWCompressor myCompressor = new LZWCompressor(args[2], args[3]);
+            try {
+                myCompressor.compress();
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
             }
+            try {
+                myCompressor.save();
+            } catch (IOException e ) {
+                //ok
+            }
+        
         }
-        //else throw new IllegalArgumentException("Illegal command line argument");
+        else if (args[0].equals("lzw") && args[1].equals("d")) {
+           // LZWDecompressor myDeCompressor = new LZWDecompressor(args[2], args[3]);
+        }
 
+
+        /*
+        else if (args[0].equals("huff") && args[1].equals("c")){
+            HUFFCompressor myCompressor = new HUFFCompressor(args[2], args[3]);
+        }
+        else if (args[0].equals("huff") && args[1].equals("d")){
+            HUFFDecompressor myDeCompressor = new HUFFDecompressor(args[2], args[3]);
+        }
+        
+
+
+        else if (args[0].equals("opt") && args[1].equals("c")) {
+            OPTCompressor myCompressor = new OPTCompressor(args[2], args[3]);
+        }
+        else if (args[0].equals("opt") && args[1].equals("d")) {
+            OPTDecompressor myDeCompressor = new OPTDecompressor(args[2], args[3]);
+        }
+        */
+        else throw new IllegalArgumentException("Illegal command line argument");
     }
 }
