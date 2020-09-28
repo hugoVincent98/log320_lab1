@@ -10,6 +10,7 @@ public class Main {
         la topologie que nous devons utilise pour acceder aux algo avec le terminal
         */
 
+        //args = new String[]{"lzw","c","C:\\Users\\Rajani\\Documents\\GitHub\\log320_Lab1\\media_files\\text.txt", "test2.txt"};
 
         if (args[0].equals("-lzw") && args[1].equals("-c")){
             LZWCompressor myCompressor = new LZWCompressor(args[2], args[3]);
