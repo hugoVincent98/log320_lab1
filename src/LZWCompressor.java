@@ -3,8 +3,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import sun.jvm.hotspot.utilities.Bits;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -83,6 +81,9 @@ public class LZWCompressor {
      */
     public void save() throws IOException {
 
+        for (int i = 0 ; i<256; i++ ) {
+            System.out.println(compressedFile.get(i));
+        }
         
 
         BitOutputStream bos = new BitOutputStream(fileOutput);
@@ -90,9 +91,11 @@ public class LZWCompressor {
         //change tous les chiffre en binaire et les met dans une liste de string
         ArrayList<String> strs = new ArrayList<String>();
         for (Integer i : compressedFile ) {
-            String result = Integer.toBinaryString(i);
-            String resultWithPadding = String.format("%8s", result).replace(" ", "0");  // 8-bit Integer
-            strs.add(resultWithPadding);
+            if(i !=null){
+                String result = Integer.toBinaryString(i);
+                String resultWithPadding = String.format("%8s", result).replace(" ", "0");  // 8-bit Integer
+                strs.add(resultWithPadding);
+            }
         }
         System.out.println(strs);
           
@@ -100,6 +103,7 @@ public class LZWCompressor {
         for(int i=0; i<strs.size(); i++) {
             for(int j=0; j<strs.get(i).length(); j++){
 
+            
                 //sort le premier charactere(premier bit) de la string en charactere 
                 char monChara = strs.get(i).charAt(strs.get(i).length()-1-j);
 
