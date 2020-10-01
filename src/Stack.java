@@ -1,10 +1,17 @@
+import org.w3c.dom.Node;
+
 public class Stack {
 
     char aChar;
     int aPos;
-    Stack left = null;
-    Stack right = null;
+    Stack left;
+    Stack right;
 
+    public Stack (int aPos){
+        this.aPos = aPos;
+        this.left = null;
+        this.right = null;
+    }
     public Stack(char aChar, int aPos){
         this.aChar = aChar;
         this.aPos = aPos;
@@ -16,4 +23,12 @@ public class Stack {
         this.left = left;
         this.right = right;
     }
+
+    /*
+    public boolean isLeaf(){
+        assert ((this.left == null) && (this.right == null)) || ((this.left != null) && (this.right != null));
+        return (this.left == null) && (this.right == null);
+    }
+    */
+
 }

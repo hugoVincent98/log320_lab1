@@ -1,6 +1,7 @@
 
 import org.w3c.dom.Node;
 
+import javax.swing.plaf.synth.SynthTabbedPaneUI;
 import java.util.*;
 import java.io.*;
 
@@ -12,8 +13,11 @@ public class Huffman {
     String parameters;
     List<Integer> compressedFile;
     BitInputStream bitInputStream;
+    BitOutputStream bitOutputStream;
+    HashMap<Character,Integer> frequency = new HashMap<Character, Integer>();
+    Stack stack;
 
-
+    public Huffman(){};
 
     public Huffman(String fileInput, String fileOutput){
         this.fileInput = fileInput;
@@ -55,6 +59,42 @@ public class Huffman {
             pos = decode(stack.right,pos,stringBuilder);
         return pos;
     }
+
+
+    public HashMap<Character,Integer> countFrequencyCharacter(char[] letter){
+        for (char charac : letter){
+            if (!frequency.containsKey(charac)){
+                frequency.put(charac,1);
+            }else {
+                frequency.put(charac,frequency.get(charac)+1);
+            }
+        }
+        return frequency;
+    }
+
+
+    public Stack addRecursive(Stack current,int value){
+        if (current == null) {
+            return new Stack(value);
+        }
+
+        if (value < current.aPos) {
+            current.left = addRecursive(current.left, value);
+        } else if (value > current.aPos) {
+            current.right = addRecursive(current.right, value);
+        } else {
+            //value already exists
+            return current;
+        }
+
+        return current;
+    }
+
+    public void add(int value) {
+        stack = addRecursive(stack, value);
+    }
+
+
 
 
     /**
