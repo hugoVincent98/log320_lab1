@@ -13,9 +13,9 @@ public class Main {
 
         if (false) {
             args = new String[] { "-lzw", "-c",
-                    "C:\\Users\\Rajani\\Documents\\GitHub\\log320_Lab1\\media_files\\text.txt", "test12" };
+                    "C:\\Users\\Rajani\\Documents\\GitHub\\log320_Lab1\\media_files\\text.txt", "test12.lzw" };
         } else {
-            args = new String[] { "-lzw", "-d", "C:\\Users\\Rajani\\Documents\\GitHub\\log320_Lab1\\test12",
+            args = new String[] { "-lzw", "-d", "C:\\Users\\Rajani\\Documents\\GitHub\\log320_Lab1\\test12.lzw",
                     "testrecompiled.txt" };
         }
 
@@ -26,7 +26,6 @@ public class Main {
             try {
                 myCompressor.compress();
             } catch (IOException e1) {
-                // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
             try {
@@ -38,11 +37,8 @@ public class Main {
         } else if (args[0].equals("-lzw") && args[1].equals("-d")) {
 
             LZWDecompressor myDecompressor = new LZWDecompressor(args[2], args[3]);
-            try {
-                myDecompressor.decompress();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            myDecompressor.decompress();
+            
             try {
                 myDecompressor.save();
             } catch (IOException e) {

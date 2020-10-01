@@ -8,39 +8,38 @@ public class LZWDecompressor {
 
     String fileInput;
     String fileOutput;
-    List<Character> deCompressedFile;
-    BitInputStream bis;
-    BitOutputStream bos;
+    List<String> deCompressedFile;
 
     public LZWDecompressor(String fileInput, String fileOutput) {
         this.fileInput = fileInput;
         this.fileOutput = fileOutput;
-        this.bis = new BitInputStream(this.fileInput);
-        this.bos = new BitOutputStream(this.fileOutput);
         deCompressedFile = new ArrayList<>();
     }
 
-    public void decompress() throws IOException {
+    public void decompress() {
 
-        // initialise le dictionnaires
+        // initialise le dictionnaire avec les char
         HashMap<Integer, String> dictionary = new HashMap<>();
         for (int i = 0; i < 256; i++) {
             dictionary.put(i, "" + (char) i);
         }
 
         // sort les caractere de compress (met en bit)
-        String bitString = "";
+        StringBuilder bitString = new StringBuilder();
         int b = 0;
+
+        // lecture du fichier
+        BitInputStream bis = new BitInputStream(this.fileInput);
 
         while (b != -1) {
             b = bis.readBit();
             if (b >= 0)
-                bitString = bitString + b;
+                bitString.append(b);
         }
         bis.close();
 
         // met les bit en caractere
-        ArrayList<Integer> fileCompressed = new ArrayList<Integer>();
+        ArrayList<Integer> fileCompressed = new ArrayList<>();
 
         for (int i = 0; i < bitString.length() / 12; i++) {
 
@@ -48,55 +47,34 @@ public class LZWDecompressor {
             fileCompressed.add(a);
         }
 
-        // debut pseudo-code
-        String s = null;
+        int previousCode = fileCompressed.get(0);
+        deCompressedFile.add(dictionary.get(previousCode));
 
-        for (int i = 0; i < fileCompressed.size(); i++) {
+        for (int i = 1; i < fileCompressed.size(); i++) {
 
-            Integer k = fileCompressed.get(i);
-            String seq = dictionary.get(k);
+            Integer currentCode = fileCompressed.get(i);
 
-            if (seq == null) {
-                seq = s + s.charAt(0);
-            }
-            deCompressedFile.add(seq.charAt(0));
-            if (s != null) {
+            if (currentCode >= dictionary.size()) {
                 if (dictionary.size() < 4096)
-                    dictionary.put(i, s + seq.charAt(0));
+                    dictionary.put(dictionary.size(),
+                            dictionary.get(previousCode) + dictionary.get(previousCode).charAt(0));
+                deCompressedFile.add(dictionary.get(previousCode) + dictionary.get(previousCode).charAt(0));
+            } else {
+                if (dictionary.size() < 4096)
+                    dictionary.put(dictionary.size(),
+                            dictionary.get(previousCode) + dictionary.get(currentCode).charAt(0));
+                deCompressedFile.add(dictionary.get(currentCode));
             }
-            s = seq;
-
+            previousCode = currentCode;
         }
 
-        System.out.println(deCompressedFile);
     }
 
     public void save() throws IOException {
-
-        // change tous les chiffre en binaire et les met dans une liste de string
-        ArrayList<String> strs = new ArrayList<String>();
-        for (Character c : deCompressedFile) {
-
-            String result = Integer.toBinaryString(c);
-            String resultWithPadding = String.format("%8s", result).replace(" ", "0"); // 8-bit Integer
-            strs.add(resultWithPadding);
-
+        try (DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(fileOutput)))) {
+            for (String c : deCompressedFile)
+                out.writeBytes(c);
         }
-
-        // passe sur tous la liste de String et sur chaque charactere des strings
-        for (int i = 0; i < strs.size(); i++) {
-            for (int j = 0; j < strs.get(i).length(); j++) {
-
-                // sort le premier charactere(premier bit) de la string en charactere
-                char monChara = strs.get(i).charAt(j);
-
-                // ecrit dans le fichier et change le charactere en int, car sinon il affiche le
-                // charactere en code ascii
-                bos.writeBit(Character.getNumericValue(monChara));
-            }
-        }
-        bos.close();
-
     }
 
 }

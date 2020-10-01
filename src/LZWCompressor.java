@@ -10,13 +10,11 @@ public class LZWCompressor {
     String fileInput;
     String fileOutput;
     List<Integer> compressedFile;
-    List<String> compressedFile2;
 
     public LZWCompressor(String fileInput, String fileOutput) {
         this.fileInput = fileInput;
         this.fileOutput = fileOutput;
         compressedFile = new ArrayList<>();
-        compressedFile2 = new ArrayList<>();
     }
 
     /**
@@ -64,7 +62,6 @@ public class LZWCompressor {
                         else {
 
                             compressedFile.add(dictionary.get(s)); // sortir le code de s
-                            compressedFile2.add(s);
                             if (dictionary.size() < 4096)
                                 dictionary.put(sc, dictionary.size());
                             s = "" + c;
@@ -72,15 +69,11 @@ public class LZWCompressor {
                     }
                 } catch (EOFException e) {
                     System.out.println("End of File");
-
                     if (!s.equals("")) {
                         compressedFile.add(dictionary.get(s));
                     }
                 }
-
             }
-        } catch (IOException e) {
-            System.out.println("IO exception : " + e);
         }
         // <--------pseudo code
     }
@@ -91,21 +84,17 @@ public class LZWCompressor {
      */
     public void save() throws IOException {
 
-        System.out.println(compressedFile);
-        System.out.println(compressedFile2);
-
         BitOutputStream bos = new BitOutputStream(fileOutput);
 
         // change tous les chiffre en binaire et les met dans une liste de string
-        ArrayList<String> strs = new ArrayList<String>();
+        ArrayList<String> strs = new ArrayList<>();
         for (Integer i : compressedFile) {
             if (i != null) {
                 String result = Integer.toBinaryString(i);
-                String resultWithPadding = String.format("%12s", result).replace(" ", "0"); // 16-bit Integer
+                String resultWithPadding = String.format("%12s", result).replace(" ", "0"); // 12-bit Integer
                 strs.add(resultWithPadding);
             }
         }
-        // System.out.println(strs);
 
         // passe sur tous la liste de String et sur chaque charactere des strings
         for (int i = 0; i < strs.size(); i++) {
