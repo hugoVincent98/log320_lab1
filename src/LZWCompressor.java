@@ -4,75 +4,78 @@ import java.util.HashMap;
 import java.util.List;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class LZWCompressor {
-    
+
     String fileInput;
     String fileOutput;
     List<Integer> compressedFile;
 
-
-    
-    public LZWCompressor(String fileInput, String fileOutput){
+    public LZWCompressor(String fileInput, String fileOutput) {
         this.fileInput = fileInput;
         this.fileOutput = fileOutput;
         compressedFile = new ArrayList<>();
     }
 
-
     /**
-     * Permet de compresser le fichier demander selon LWZ
+     * Permet de compresser le fichier demander selon LWZ Suit une logique inspiré
+     * de :
+     * https://github.com/ayonious/File-Compression/blob/master/src/main/java/prog/Lzipping.java
      * 
      * @throws IOException
      * 
      */
     public void compress() throws IOException {
 
-        ArrayList<String> listeChar = new ArrayList<>();
-
-       // BitInputStream b = new BitInputStream(fileInput);
-       byte[] array = Files.readAllBytes(Paths.get(fileInput));
-
-        for (byte b : array)
-         listeChar.add(""+ (char) b);
-        
-        
-        //initialise le dictionnaire
-        
+        // initialise le dictionnaire
         HashMap<String, Integer> dictionary = new HashMap<>();
-        for (int i = 0; i < 255; i++) {
+        for (int i = 0; i < 256; i++) {
             dictionary.put("" + (char) i, i);
         }
-        
 
+        // pseudo code -------->
+        try (FileInputStream fileinputStream = new FileInputStream(fileInput)) {
+            try (DataInputStream datainStream = new DataInputStream(fileinputStream)) {
 
-        //pseudo code -------->
-        String c = "";
-        String p = listeChar.get(0);
-        int code = 256;
-        for(int i = 0 ; i < listeChar.size(); i++){
-            
-            if (i != listeChar.size() -1)
-                c += listeChar.get(i);
-                
-           
-            if (dictionary.keySet().contains(p+c)) {
-                p = p + c;
-                
-            } else {                
-                compressedFile.add(dictionary.get(p));
-                dictionary.put(p+c,code );
-                code++;
-                p = c;
+                String s = "";
+                Byte b;
 
+                try {
+
+                    b = datainStream.readByte(); // récupère le premier Byte du fichier
+                    int i = b.intValue();
+                    if (i < 0)
+                        i += 256;
+                    char c = (char) i;// transforme le Byte en Char
+                    s = "" + c;
+                    while (true) {
+
+                        b = datainStream.readByte(); // récupère le Byte du fichier
+                        i = b.intValue();
+                        if (i < 0)
+                            i += 256;
+
+                        c = (char) i;// transforme le Byte en Char
+                        String sc = s + c;
+                        if (dictionary.containsKey(sc))
+                            s = s + c;
+                        else {
+
+                            compressedFile.add(dictionary.get(s)); // sortir le code de s
+                            if (dictionary.size() < 4096)
+                                dictionary.put(sc, dictionary.size());
+                            s = "" + c;
+                        }
+                    }
+                } catch (EOFException e) {
+                    System.out.println("End of File");
+                    if (!s.equals("")) {
+                        compressedFile.add(dictionary.get(s));
+                    }
+                }
             }
-            c = "";
         }
-        compressedFile.add(dictionary.get(p));
-        //<--------pseudo code
-        
+        // <--------pseudo code
     }
 
     /**
@@ -81,36 +84,31 @@ public class LZWCompressor {
      */
     public void save() throws IOException {
 
-        for (int i = 0 ; i<256; i++ ) {
-            System.out.println(compressedFile.get(i));
-        }
-        
-
         BitOutputStream bos = new BitOutputStream(fileOutput);
 
-        //change tous les chiffre en binaire et les met dans une liste de string
-        ArrayList<String> strs = new ArrayList<String>();
-        for (Integer i : compressedFile ) {
-            if(i !=null){
+        // change tous les chiffre en binaire et les met dans une liste de string
+        ArrayList<String> strs = new ArrayList<>();
+        for (Integer i : compressedFile) {
+            if (i != null) {
                 String result = Integer.toBinaryString(i);
-                String resultWithPadding = String.format("%8s", result).replace(" ", "0");  // 8-bit Integer
+                String resultWithPadding = String.format("%12s", result).replace(" ", "0"); // 12-bit Integer
                 strs.add(resultWithPadding);
             }
         }
-        System.out.println(strs);
-          
-        //passe sur tous la liste de String et sur chaque charactere des strings
-        for(int i=0; i<strs.size(); i++) {
-            for(int j=0; j<strs.get(i).length(); j++){
 
-            
-                //sort le premier charactere(premier bit) de la string en charactere 
-                char monChara = strs.get(i).charAt(strs.get(i).length()-1-j);
+        // passe sur tous la liste de String et sur chaque charactere des strings
+        for (int i = 0; i < strs.size(); i++) {
+            for (int j = 0; j < strs.get(i).length(); j++) {
 
-                //ecrit dans le fichier et change le charactere en int, car sinon il affiche le charactere en code
+                // sort le premier charactere(premier bit) de la string en charactere
+                char monChara = strs.get(i).charAt(j);
+
+                // ecrit dans le fichier et change le charactere en int, car sinon il affiche le
+                // charactere en code ascii
                 bos.writeBit(Character.getNumericValue(monChara));
             }
-        }   
-                
+        }
+        bos.close();
+
     }
 }
