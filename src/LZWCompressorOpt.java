@@ -10,13 +10,12 @@ public class LZWCompressorOpt {
     String fileInput;
     String fileOutput;
     List<Integer> compressedFile;
-    byte[] bytes;
+    // https://codereview.stackexchange.com/questions/122080/simplifying-lzw-compression-decompression
 
     public LZWCompressorOpt(String fileInput, String fileOutput) {
         this.fileInput = fileInput;
         this.fileOutput = fileOutput;
         compressedFile = new ArrayList<>();
-        bytes = new byte[2];
     }
 
     /**
@@ -36,9 +35,9 @@ public class LZWCompressorOpt {
         }
 
         // pseudo code -------->
+        BitOutputStream bos = new BitOutputStream(fileOutput);
         try (FileInputStream fileinputStream = new FileInputStream(fileInput)) {
             try (DataInputStream datainStream = new DataInputStream(fileinputStream)) {
-           
                 String s = "";
                 Byte b;
 
@@ -63,7 +62,10 @@ public class LZWCompressorOpt {
                             s = s + c;
                         else {
 
-                            compressedFile.add(dictionary.get(s)); // sortir le code de s
+                            String resultWithPadding = String.format("%12s", Integer.toBinaryString(dictionary.get(s))).replace(" ", "0");
+                            for (int j=0;j<resultWithPadding.length();j++)
+                                bos.writeBit(Integer.parseInt(resultWithPadding.substring(j, j+1)));
+
                             if (dictionary.size() < 4096)
                                 dictionary.put(sc, dictionary.size());
                             s = "" + c;
@@ -72,45 +74,17 @@ public class LZWCompressorOpt {
                 } catch (EOFException e) {
                     System.out.println("End of File");
                     if (!s.equals("")) {
-                        compressedFile.add(dictionary.get(s));
+                        String resultWithPadding = String.format("%12s", Integer.toBinaryString(dictionary.get(s))).replace(" ", "0");
+                        for (int j=0;j<resultWithPadding.length();j++)
+                            bos.writeBit(Integer.parseInt(resultWithPadding.substring(j, j+1)));
                     }
                 }
+                
             }
+        bos.close();
         }
         // <--------pseudo code
     }
 
-    /**
-     * Permet de output le fichier compresser
-     * 
-     */
-    public void save() throws IOException {
 
-        BitOutputStream bos = new BitOutputStream(fileOutput);
-
-        // change tous les chiffre en binaire et les met dans une liste de string
-        ArrayList<String> strs = new ArrayList<>();
-        for (Integer i : compressedFile) {
-            if (i != null) {
-                String result = Integer.toBinaryString(i);
-                String resultWithPadding = String.format("%12s", result).replace(" ", "0"); // 12-bit Integer
-                strs.add(resultWithPadding);
-            }
-        }
-
-        // passe sur tous la liste de String et sur chaque charactere des strings
-        for (int i = 0; i < strs.size(); i++) {
-            for (int j = 0; j < strs.get(i).length(); j++) {
-
-                // sort le premier charactere(premier bit) de la string en charactere
-                char monChara = strs.get(i).charAt(j);
-
-                // ecrit dans le fichier et change le charactere en int, car sinon il affiche le
-                // charactere en code ascii
-                bos.writeBit(Character.getNumericValue(monChara));
-            }
-        }
-        bos.close();
-
-    }
 }

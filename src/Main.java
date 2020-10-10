@@ -9,7 +9,7 @@ public class Main {
             return new String[] { "-opt", "-c",
                     "C:\\Users\\Rajani\\Documents\\GitHub\\log320_Lab1\\media_files\\exemple.txt", "test12opt.lzw" };
         } else {
-            return new String[] { "-opt", "-d",
+            return new String[] { "-lzw", "-d",
                     "C:\\Users\\Rajani\\Documents\\GitHub\\log320_Lab1\\test12opt.lzw", "testcompiled.txt" };
         }
     }
@@ -53,7 +53,6 @@ public class Main {
                 LZWCompressorOpt myCompressor = new LZWCompressorOpt(args[2], args[3]);
                 Instant start = Instant.now();
                 myCompressor.compress();
-                myCompressor.save();
                 Instant end = Instant.now();
                 Duration diff = Duration.between(start, end);
                 System.out.println("milli: " + diff.toMillis());
