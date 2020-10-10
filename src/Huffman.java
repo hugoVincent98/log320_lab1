@@ -93,7 +93,7 @@ public class Huffman {
         stack = addRecursive(stack, value);
     }
 
-
+ 
 
 
     /**
@@ -110,7 +110,7 @@ public class Huffman {
      *
      */
     public void decompress() throws IOException {
-
+        
     }
 
     /**
@@ -118,7 +118,7 @@ public class Huffman {
      *
      */
     public void save() throws IOException {
-
+        
 
     }
 }
