@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - BitWriter",
+            "request": "launch",
+            "mainClass": "BitWriter",
+            "projectName": "log320_Lab1_3e7a7110"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - Main",
             "request": "launch",
             "mainClass": "Main",
