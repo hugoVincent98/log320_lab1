@@ -9,6 +9,13 @@
             "name": "CodeLens (Launch) - Main",
             "request": "launch",
             "mainClass": "Main",
+            "projectName": "log320_Lab1_3d509a2"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Main",
+            "request": "launch",
+            "mainClass": "Main",
             "projectName": "log320_Lab1_986f2acb"
         },
         {

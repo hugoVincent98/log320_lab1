@@ -24,11 +24,11 @@ public class Stack {
         this.right = right;
     }
 
-    /*
+    
     public boolean isLeaf(){
         assert ((this.left == null) && (this.right == null)) || ((this.left != null) && (this.right != null));
         return (this.left == null) && (this.right == null);
     }
-    */
+    
 
 }
