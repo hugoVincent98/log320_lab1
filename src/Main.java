@@ -19,6 +19,8 @@ public class Main {
                     "testrecompiled.txt" };
         }
 
+        
+
         // test pour decompress
 
         if (args[0].equals("-lzw") && args[1].equals("-c")) {
@@ -52,6 +54,17 @@ public class Main {
                 System.out.println("test");
                 Huffman myCompressor = new Huffman(args[2], args[3]);
                 myCompressor.compress();
+
+                //test a retirer après
+                BitInputStream boi = new BitInputStream(args[3]);
+                int b = boi.readBit();
+                while (b > -1) {
+        
+                    System.out.print(b);
+                    b = boi.readBit();
+                }
+                boi.close();
+
             } catch (IOException e) {
 
                 e.printStackTrace();
