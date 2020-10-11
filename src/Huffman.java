@@ -56,9 +56,10 @@ public class Huffman {
 
         while (huffmanQueue.size() > 1) {
 
-            // on retrieve les 2 min
+            // on retrieve les 2 min de la queue
             HuffmanNode h1 = huffmanQueue.poll();
             HuffmanNode h2 = huffmanQueue.poll();
+
             // crée un nouveau qui a la somme de frequence
             HuffmanNode hsum = new HuffmanNode(h1.frequence + h2.frequence, true);
 
@@ -76,7 +77,7 @@ public class Huffman {
         // on commence par encoder le treemap dans le fichier
         BitOutputStream bos = new BitOutputStream(fileOutput);
 
-        encoderHuffmanTreemap(racine, bos);
+        encodeHuffmanTreemap(racine, bos);
 
         // ferme le stream à la fin de l'écriture
         bos.close();
@@ -88,11 +89,27 @@ public class Huffman {
      * méthode qui sert à encoder le Huffman treeMap au début du fichier.
      * https://stackoverflow.com/questions/759707/efficient-way-of-storing-huffman-tree
      * 
+     * https://mkyong.com/java/java-how-to-convert-a-byte-to-a-binary-string/
      * @param bos
      * @param racine
      */
-    public void encoderHuffmanTreemap(HuffmanNode racine, BitOutputStream bos) {
-        // f
+    public void encodeHuffmanTreemap(HuffmanNode racine, BitOutputStream bos) {
+
+        if (!racine.isCombined) {
+            bos.writeBit(1);
+
+            int result = racine.symbole & 0xff;
+            String resultWithPadZero = String.format("%8s", Integer.toBinaryString(result)).replace(" ", "0");
+            
+            // on écrit le byte bit par bit dans le Stream
+            for(int n = 0; n < resultWithPadZero.length(); n++)
+                bos.writeBit(Character.getNumericValue(resultWithPadZero.charAt(n)));
+            
+        } else {
+            bos.writeBit(0);
+            encodeHuffmanTreemap(racine.left, bos);
+            encodeHuffmanTreemap(racine.right, bos);
+        }
     }
 
     public void printCode(HuffmanNode noeud, String s) {
