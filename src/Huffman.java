@@ -7,16 +7,16 @@ public class Huffman {
 
     String fileInput;
     String fileOutput;
-    String parameters;
-    BitInputStream bitInputStream;
-    HashMap<Byte, Integer> tableFrequences = new HashMap<>();
-    HashMap<Byte, String> tableCodes = new HashMap<>();
-    Queue<Byte> file = new LinkedList<>();
+    HashMap<Byte, Integer> tableFrequences;
+    HashMap<Byte, String> tableCodes;
+    Queue<Byte> file;
 
     public Huffman(String fileInput, String fileOutput) {
         this.fileInput = fileInput;
         this.fileOutput = fileOutput;
-        this.bitInputStream = new BitInputStream(fileInput);
+        file = new LinkedList<>();
+        tableCodes = new HashMap<>();
+        tableFrequences = new HashMap<>();
     }
 
     /**
@@ -149,7 +149,6 @@ public class Huffman {
         if (noeud.isLeaf()) {
             // on l'ajoute à la table de codes
             tableCodes.put(noeud.symbole, s);
-            System.out.println("symbole : " + noeud.symbole + " freq : " + noeud.frequence + " code :" + s);
             return;
         }
 
@@ -208,6 +207,8 @@ public class Huffman {
                 bitString.substring(16 + nbBitTreeMap, bitString.length() - eof));
 
         // on save le message décodé dans le out
+        // le fichier compress passe à travers la racine jusqu'à trouver
+        // son char. Lorqu'il le trouve, il revient à la racine
         try (DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(fileOutput)))) {
 
             int endoffile = 0;
