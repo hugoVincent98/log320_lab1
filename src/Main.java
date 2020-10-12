@@ -1,87 +1,61 @@
 import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
 
 public class Main {
 
-    public static String [] test (boolean v) {
-        if (v) {
-            return new String[] { "-opt", "-c",
-                    "C:\\Users\\Rajani\\Documents\\GitHub\\log320_Lab1\\media_files\\exemple.txt", "test12opt.lzw" };
-        } else {
-            return new String[] { "-lzw", "-d",
-                    "C:\\Users\\Rajani\\Documents\\GitHub\\log320_Lab1\\test12opt.lzw", "testcompiled.txt" };
-        }
-    }
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        args = test(true);
+        final String algotype = args[0];
+        final String parameters = args[1];
+        final String inputFile = args[2];
+        final String outputFile = args[3];
+        final int maxArgs = 4;
+
         /*
          * –[huff|lzw|opt] –[d|c] <fichier d’entrée> <fichier de sortie> la topologie
          * que nous devons utilise pour acceder aux algo avec le terminal
          */
 
+        if (args.length != maxArgs) {
+            System.out.println("Missing arguments");
+            System.out.println("–[huff|lzw|opt] –[d|c] <inputFile> <outputFile>");
+        } else {
 
-        if (args[0].equals("-lzw") && args[1].equals("-c")) {
-            LZWCompressor myCompressor = new LZWCompressor(args[2], args[3]);
-            try {
-                myCompressor.compress();
-            } catch (IOException e1) {
-                e1.printStackTrace();
+            if (parameters.equals("-c")) {
+                switch (algotype) {
+                    case "-lzw":
+                        LZWCompressor lzwc = new LZWCompressor(inputFile, outputFile);
+                        lzwc.compress();
+                        break;
+                    case "-huff":
+                        Huffman huffman = new Huffman(inputFile, outputFile);
+                        huffman.compress();
+                        break;
+                    case "-opt":
+                        // mettre le compressor opt ici
+                        break;
+                    default:
+                        System.out.println("–[huff|lzw|opt]");
+                }
+            } else if (parameters.equals("-d")) {
+                switch (algotype) {
+                    case "-lzw":
+                        LZWDecompressor lzwd = new LZWDecompressor(inputFile, outputFile);
+                        lzwd.decompress();
+                        break;
+                    case "-huff":
+                        Huffman huffman = new Huffman(inputFile, outputFile);
+                        huffman.decompress();
+                        break;
+                    case "-opt":
+                        // mettre le compressor opt ici
+                        break;
+                    default:
+                        System.out.println("–[huff|lzw|opt]");
+                }
+            } else {
+                System.out.println("–[d|c] only");
             }
-            try {
-                myCompressor.save();
-            } catch (IOException e) {
-                // ok
-            }
-
-        } else if (args[0].equals("-lzw") && args[1].equals("-d")) {
-
-            LZWDecompressor myDecompressor = new LZWDecompressor(args[2], args[3]);
-            myDecompressor.decompress();
-            
-            try {
-                myDecompressor.save();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }  else if (args[0].equals("-opt") && args[1].equals("-c")) {
-           
-           
-            try {
-                LZWCompressorOpt myCompressor = new LZWCompressorOpt(args[2], args[3]);
-                Instant start = Instant.now();
-                myCompressor.compress();
-                Instant end = Instant.now();
-                Duration diff = Duration.between(start, end);
-                System.out.println("milli: " + diff.toMillis());
-                System.out.println(String.format("%d:%02d:%02d", 
-                     diff.toMinutesPart(), 
-                     diff.toSecondsPart(),
-                     diff.toMillisPart()));
-
-            } catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-            
-        } 
-
-        /*
-         * else if (args[0].equals("huff") && args[1].equals("c")){ HUFFCompressor
-         * myCompressor = new HUFFCompressor(args[2], args[3]); } else if
-         * (args[0].equals("huff") && args[1].equals("d")){ HUFFDecompressor
-         * myDeCompressor = new HUFFDecompressor(args[2], args[3]); }
-         * 
-         * 
-         * 
-         * else if (args[0].equals("opt") && args[1].equals("c")) { OPTCompressor
-         * myCompressor = new OPTCompressor(args[2], args[3]); } else if
-         * (args[0].equals("opt") && args[1].equals("d")) { OPTDecompressor
-         * myDeCompressor = new OPTDecompressor(args[2], args[3]); }
-         */
-        else
-            throw new IllegalArgumentException("Illegal command line argument");
+        }
     }
+
 }
