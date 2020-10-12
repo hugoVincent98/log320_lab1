@@ -9,7 +9,6 @@ public class Huffman {
     String fileOutput;
     String parameters;
     BitInputStream bitInputStream;
-    BitOutputStream bitOutputStream;
     HashMap<Byte, Integer> tableFrequences = new HashMap<>();
     HashMap<Byte, String> tableCodes = new HashMap<>();
     Queue<Byte> file = new LinkedList<>();
@@ -20,6 +19,9 @@ public class Huffman {
         this.bitInputStream = new BitInputStream(fileInput);
     }
 
+    /**
+     * Permet de compresser le fichier demander selon l'algorithme huffman
+     */
     public void compress() throws IOException {
 
         try (FileInputStream fileinputStream = new FileInputStream(fileInput)) {
@@ -39,7 +41,7 @@ public class Huffman {
 
         // ajouter les données du hashMap dans la queue
         for (Map.Entry<Byte, Integer> entry : tableFrequences.entrySet())
-            huffmanQueue.add(new HuffmanNode(entry.getKey(), entry.getValue(), false));
+            huffmanQueue.add(new HuffmanNode(entry.getKey(), entry.getValue()));
 
         HuffmanNode racine = null;
 
@@ -50,7 +52,7 @@ public class Huffman {
             HuffmanNode h2 = huffmanQueue.poll();
 
             // crée un nouveau qui a la somme de frequence
-            HuffmanNode hsum = new HuffmanNode(h1.frequence + h2.frequence, true);
+            HuffmanNode hsum = new HuffmanNode(h1.frequence + h2.frequence);
 
             hsum.left = h1;
             hsum.right = h2;
@@ -63,40 +65,49 @@ public class Huffman {
         // prend le dernier élément (racine) de la Queue
         racine = huffmanQueue.poll();
 
-        // on commence par encoder le treemap dans le fichier
-        BitOutputStream bos = new BitOutputStream(fileOutput);
+        // écrire le code compressé dans le file
+        StringBuilder fileCompressed = new StringBuilder();
+        int nbSymbole = tableFrequences.size();
 
-        // le premier byte sera la taille de bits que prend le Huffman Tree dans le
-        // fichier
-        int tailleTree = 10 * tableFrequences.size() - 1;
-        String result = String.format("%8s", Integer.toBinaryString(tailleTree)).replace(" ", "0");
+        // premier byte dédié à au nombre de char utilisé dans le treeMap
+        fileCompressed.append(String.format("%8s", Integer.toBinaryString(nbSymbole)).replace(" ", "0"));
 
-        // on écrit le byte bit par bit dans le Stream
-        for (int n = 0; n < result.length(); n++)
-            bos.writeBit(Character.getNumericValue(result.charAt(n)));
+        // On dédie ensuite un total de n bits pour le treeMap Huffman
+        // n bits est égal à la formule : 10 * NUMBER_OF_CHARACTERS - 1
+        // NUMBER_OF_CHARACTERS étant le nombre de symboles utilisés dans le treeMap
+        // C'est pour ça qu'on dédie le premier byte au nombre de char pour savoir quand
+        // arrêter
+        encodeHuffmanTreemap(racine, fileCompressed);
 
-        encodeHuffmanTreemap(racine, bos);
-
-        System.out.println("number bit : " + test);
-        // ferme le stream à la fin de l'écriture
-
+        // on crée un HashMap clé valeur de la table de codes pour l'encodage
         createCode(racine, "");
 
-        // écrire le code compressé dans le file
+        // on encode ensuite le file en utilisant la table de codes
         Byte b = file.poll();
         while (b != null) {
             String code = tableCodes.get(b);
             // on écrit le byte bit par bit dans le Stream
-            for (int n = 0; n < code.length(); n++)
-                bos.writeBit(Character.getNumericValue(code.charAt(n)));
+            fileCompressed.append(code);
             b = file.poll();
         }
 
+        // on ajoute au debut du fichier un autre byte qui sera dédié à dire combien de
+        // 0
+        // il y a à la fin du file. C'est parce que si le file ne finit pas avec un 8
+        // bits, BitOutputStream va rajouter des 0 à la fin pour compléter le dernier
+        // byte.
+        int eof = 8 - (fileCompressed.length() % 8);
+        fileCompressed.insert(0, String.format("%8s", Integer.toBinaryString(eof)).replace(" ", "0"));
+
+        // compresser les bits dans le fichier
+
+        BitOutputStream bos = new BitOutputStream(fileOutput);
+
+        for (int n = 0; n < fileCompressed.length(); n++)
+            bos.writeBit(Character.getNumericValue(fileCompressed.charAt(n)));
+
         bos.close();
-
     }
-
-    int test = 0;
 
     /**
      * méthode qui sert à encoder le Huffman treeMap au début du fichier.
@@ -107,22 +118,19 @@ public class Huffman {
      * @param bos
      * @param racine
      */
-    public void encodeHuffmanTreemap(HuffmanNode racine, BitOutputStream bos) {
+    public void encodeHuffmanTreemap(HuffmanNode racine, StringBuilder fileCompressed) {
 
-        if (!racine.isCombined) {
-            bos.writeBit(1);
+        if (racine.isLeaf()) {
+            fileCompressed.append("1");
             int result = racine.symbole & 0xff;
             String resultWithPadZero = String.format("%8s", Integer.toBinaryString(result)).replace(" ", "0");
-
-            // on écrit le byte bit par bit dans le Stream
-            for (int n = 0; n < resultWithPadZero.length(); n++)
-                bos.writeBit(Character.getNumericValue(resultWithPadZero.charAt(n)));
+            fileCompressed.append(resultWithPadZero);
 
         } else {
-            bos.writeBit(0);
+            fileCompressed.append("0");
 
-            encodeHuffmanTreemap(racine.left, bos);
-            encodeHuffmanTreemap(racine.right, bos);
+            encodeHuffmanTreemap(racine.left, fileCompressed);
+            encodeHuffmanTreemap(racine.right, fileCompressed);
         }
     }
 
@@ -138,7 +146,7 @@ public class Huffman {
         // base case; if the left and right are null
         // then its a leaf node and we print
         // the code s generated by traversing the tree.
-        if (noeud.left == null && noeud.right == null && !noeud.isCombined) {
+        if (noeud.isLeaf()) {
             // on l'ajoute à la table de codes
             tableCodes.put(noeud.symbole, s);
             System.out.println("symbole : " + noeud.symbole + " freq : " + noeud.frequence + " code :" + s);
@@ -164,27 +172,80 @@ public class Huffman {
         }
     }
 
+    /**
+     * Méthode qui sert à décompresser un fichier Huffman
+     */
+    public void decompress() throws IOException {
 
+        // sort les caractere de compress (met en bit)
+        StringBuilder bitString = new StringBuilder();
+        int b = 0;
 
+        // lecture du fichier
+        BitInputStream bis = new BitInputStream(this.fileInput);
 
-
-
-    public void decode_files (HuffmanNode racine, String s) {
-
-        if(racine == null) return;
-        StringBuilder stringBuilder = new StringBuilder();
-
-        int position = 0;
-        Node current = racine;
-
-        Char[] aChar = s.toCharArray();
-
-        while(){
-
+        while (b != -1) {
+            b = bis.readBit();
+            if (b >= 0)
+                bitString.append(b);
         }
+        bis.close();
 
+        // on va chercher le premier byte dédié à dire quand arrêter
+        // de lire le fichier
+        int eof = Integer.parseInt(bitString.substring(0, 8), 2);
 
+        // on va lire le deuxième byte dédié au nb de char utilisé dans le treemap
+        int nbchar = Integer.parseInt(bitString.substring(8, 16), 2);
+
+        int nbBitTreeMap = (10 * nbchar) - 1;
+
+        StringBuilder treemapCompressed = new StringBuilder(bitString.substring(16, 16 + nbBitTreeMap));
+        HuffmanNode racine = readNode(treemapCompressed);
+
+        // on prend le fichier compressé sans les derniers 0 en trop
+        StringBuilder fileToDecompress = new StringBuilder(
+                bitString.substring(16 + nbBitTreeMap, bitString.length() - eof));
+
+        // on save le message décodé dans le out
+        try (DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(fileOutput)))) {
+
+            int endoffile = 0;
+            HuffmanNode currentNode = racine;
+            while (endoffile != -1) {
+
+                int value = Integer.parseInt(fileToDecompress.substring(0, 1), 2);
+
+                fileToDecompress.deleteCharAt(0);
+
+                if (value == 0) {
+                    currentNode = currentNode.left;
+                } else if (value == 1) {
+                    currentNode = currentNode.right;
+                }
+
+                if (currentNode.isLeaf()) {
+                    out.writeByte(currentNode.symbole);
+                    currentNode = racine;
+                }
+                if (fileToDecompress.length() == 0)
+                    endoffile = -1;
+            }
+        }
     }
 
+    HuffmanNode readNode(StringBuilder reader) {
+        char b = reader.charAt(0);
+        reader.deleteCharAt(0);
+        if (b == '1') {
+            int value = Integer.parseInt(reader.substring(0, 8), 2);
+            reader.delete(0, 8);
+            return new HuffmanNode((byte) value, null, null);
+        } else {
+            HuffmanNode leftChild = readNode(reader);
+            HuffmanNode rightChild = readNode(reader);
+            return new HuffmanNode(leftChild, rightChild);
+        }
+    }
 
 }

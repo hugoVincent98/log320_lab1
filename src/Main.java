@@ -2,6 +2,15 @@ import java.io.IOException;
 
 public class Main {
 
+    public static String[] test(boolean v) {
+        if (v) {
+           return new String[] { "-huff", "-c",
+                    "C:\\Users\\Rajani\\Documents\\GitHub\\log320_Lab1\\media_files\\text.txt", "test12.huff" };
+        } else {
+            return  new String[] { "-huff", "-d", "C:\\Users\\Rajani\\Documents\\GitHub\\log320_Lab1\\test12.huff",
+                    "testrecompiled.txt" };
+        }
+    }
     public static void main(String[] args) {
 
         /*
@@ -10,16 +19,8 @@ public class Main {
          */
 
         // test pour compress
-
-        if (true) {
-            args = new String[] { "-huff", "-c",
-                    "C:\\Users\\Rajani\\Documents\\GitHub\\log320_Lab1\\media_files\\test.txt", "test12.huff" };
-        } else {
-            args = new String[] { "-lzw", "-d", "C:\\Users\\Rajani\\Documents\\GitHub\\log320_Lab1\\test12.lzw",
-                    "testrecompiled.txt" };
-        }
-
-        
+        args = test(false);
+       
 
         // test pour decompress
 
@@ -70,7 +71,13 @@ public class Main {
                 e.printStackTrace();
             }
         } else if (args[0].equals("-huff") && args[1].equals("-d")) {
-
+            Huffman decompressor = new Huffman(args[2], args[3]);
+            try {
+                decompressor.decompress();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
 
         else

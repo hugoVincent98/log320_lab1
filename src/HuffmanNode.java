@@ -1,24 +1,34 @@
 public class HuffmanNode {
 
-    public HuffmanNode() {
-
-    }
-
-    public HuffmanNode(Integer integer,boolean isCombined) {
-        frequence = integer;
-        this.isCombined = isCombined;
-    }
-
-    public HuffmanNode(byte key, Integer integer, boolean isCombined) {
+    public HuffmanNode(byte key, Integer integer) {
         symbole = key;
         frequence = integer;
-        this.isCombined = isCombined;
     }
 
-    boolean isCombined;
+    // utilisé lorsque le node n'est pas un leaf
+    public HuffmanNode(Integer integer) {
+        frequence = integer;
+    }
+
+    // utilisé lorsque le node n'est pas un leaf
+    public HuffmanNode(HuffmanNode left, HuffmanNode right) {
+        this.left = left;
+        this.right = right;
+    }
+
+    public HuffmanNode(byte key, HuffmanNode left, HuffmanNode right) {
+        symbole = key;
+        this.left = left;
+        this.right = right;
+    }
+
     byte symbole;
     int frequence;
 
     HuffmanNode left;
     HuffmanNode right;
+
+    public boolean isLeaf() {
+        return left == null && right == null;
+    }
 }
