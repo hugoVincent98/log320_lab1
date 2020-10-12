@@ -197,8 +197,10 @@ public class Huffman {
         // on va lire le deuxième byte dédié au nb de char utilisé dans le treemap
         int nbchar = Integer.parseInt(bitString.substring(8, 16), 2);
 
+        // la formule qui détermine le nb de bits alloués au treemap dans le fichier
         int nbBitTreeMap = (10 * nbchar) - 1;
 
+        // on extrait de bitString le n bits qui représente le treeMap
         StringBuilder treemapCompressed = new StringBuilder(bitString.substring(16, 16 + nbBitTreeMap));
         HuffmanNode racine = readNode(treemapCompressed);
 
