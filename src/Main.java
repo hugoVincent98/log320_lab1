@@ -25,13 +25,15 @@ public class Main {
                     case "-lzw":
                         LZWCompressor lzwc = new LZWCompressor(inputFile, outputFile);
                         lzwc.compress();
+                        lzwc.save();
                         break;
                     case "-huff":
                         Huffman huffman = new Huffman(inputFile, outputFile);
                         huffman.compress();
                         break;
                     case "-opt":
-                        // mettre le compressor opt ici
+                        LZWCompressorOpt lz = new LZWCompressorOpt(inputFile, outputFile);
+                        lz.compress();
                         break;
                     default:
                         System.out.println("–[huff|lzw|opt]");
@@ -41,13 +43,16 @@ public class Main {
                     case "-lzw":
                         LZWDecompressor lzwd = new LZWDecompressor(inputFile, outputFile);
                         lzwd.decompress();
+                        lzwd.save();
                         break;
                     case "-huff":
                         Huffman huffman = new Huffman(inputFile, outputFile);
                         huffman.decompress();
                         break;
                     case "-opt":
-                        // mettre le compressor opt ici
+                        LZWDecompressorOpt lzd = new LZWDecompressorOpt(inputFile, outputFile);
+                        lzd.decompress();
+                        lzd.save();
                         break;
                     default:
                         System.out.println("–[huff|lzw|opt]");
