@@ -9,7 +9,7 @@ public class Main {
         final String inputFile = args[2];
         final String outputFile = args[3];
         final int maxArgs = 4;
-
+        
         /*
          * –[huff|lzw|opt] –[d|c] <fichier d’entrée> <fichier de sortie> la topologie
          * que nous devons utilise pour acceder aux algo avec le terminal

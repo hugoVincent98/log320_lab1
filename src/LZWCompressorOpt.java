@@ -2,7 +2,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 import java.io.*;
 
 public class LZWCompressorOpt {
@@ -69,6 +69,9 @@ public class LZWCompressorOpt {
                             if (dictionary.size() < 4096)
                                 dictionary.put(sc, dictionary.size());
                             s = "" + c;
+
+                            if (dictionary.size() == 4096)
+                                resetDictionnary(dictionary);
                         }
                     }
                 } catch (EOFException e) {
@@ -84,6 +87,13 @@ public class LZWCompressorOpt {
         bos.close();
         }
         // <--------pseudo code
+    }
+
+    public void resetDictionnary(Map<String, Integer> dictionary) {
+        dictionary.clear();
+        for (int i = 0; i < 256; i++) {
+            dictionary.put("" + (char) i, i);
+        }
     }
 
 

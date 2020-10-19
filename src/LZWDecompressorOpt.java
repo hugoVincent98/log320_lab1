@@ -2,6 +2,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.io.*;
 
 public class LZWDecompressorOpt {
@@ -69,11 +70,19 @@ public class LZWDecompressorOpt {
             }
             previousCode = currentCode;
             if (dictionary.size()==4096)
-                dictionary.clear();
+                resetDictionnary(dictionary);
         }
 
     }
 
+    public void resetDictionnary(Map<Integer, String> dictionary) {
+        dictionary.clear();
+        for (int i = 0; i < 256; i++) {
+            dictionary.put(i, "" + (char) i);
+        }
+
+    }
+    
     public void save() throws IOException {
         try (DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(fileOutput)))) {
             for (String c : deCompressedFile)
