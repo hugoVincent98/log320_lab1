@@ -12,6 +12,8 @@ Dans les compressions avec perte, ce n’est pas le cas. Le fichier décompress�
 le cas pour la compréhension vidéo pour laquelle la perte de qualité produite par la décompression peut ne pas être
 visible à l’œil. Dans le cas de ce laboratoire, nous allons nous concentrer sur deux algorithmes sans perte : LZW et
 Huffman.
+
+
 Les objectifs de ce laboratoire sont :
 - Comprendre les algorithmes proposés et les implémenter
 - Implémenter efficacement les algorithmes
