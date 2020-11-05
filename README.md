@@ -1,6 +1,4 @@
-# log320_Lab1
-Algorithmes de compression LZW et Huffman
-
+# Algorithmes de compression LZW et Huffman
 
 
 Il y a de plus de données disponibles et plusieurs de ces types de données occupent beaucoup d’espace (ou doivent
