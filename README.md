@@ -13,8 +13,8 @@ le cas pour la compréhension vidéo pour laquelle la perte de qualité produite
 visible à l’œil. Dans le cas de ce laboratoire, nous allons nous concentrer sur deux algorithmes sans perte : LZW et
 Huffman.
 Les objectifs de ce laboratoire sont :
-• Comprendre les algorithmes proposés et les implémenter
-• Implémenter efficacement les algorithmes
-• Proposer des optimisations
-• Analyser asymptotiquement l’algorithme
-• Être en mesure de justifier les choix de conception
+- Comprendre les algorithmes proposés et les implémenter
+- Implémenter efficacement les algorithmes
+- Proposer des optimisations
+- Analyser asymptotiquement l’algorithme
+- Être en mesure de justifier les choix de conception
